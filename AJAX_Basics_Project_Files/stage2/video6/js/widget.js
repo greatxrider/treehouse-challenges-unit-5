@@ -1,20 +1,30 @@
 var xhr = new XMLHttpRequest();
+
 xhr.onreadystatechange = function () {
-  if(xhr.readyState === 4 && xhr.status === 200) {
-    var employees = JSON.parse(xhr.responseText);
-    var statusHTML = '<ul class="bulleted">';
-    for (var i=0; i<employees.length; i += 1) {
-      if (employees[i].inoffice === true) {
-        statusHTML += '<li class="in">';
-      } else {
-        statusHTML += '<li class="out">';
+  if (xhr.readyState === 4) { // Check if request is complete
+    if (xhr.status === 200) { // Check if request was successful
+      console.log(xhr.responseText);
+      try {
+        var employees = JSON.parse(xhr.responseText); // Parse JSON response
+        var statusHTML = '<ul class="bulleted">';
+
+        // Iterate over employees array
+        for (var i = 0; i < employees.length; i++) {
+          var className = employees[i].inoffice ? 'in' : 'out'; // Determine class based on status
+          statusHTML += `<li class="${className}">${employees[i].name}</li>`;
+        }
+
+        statusHTML += '</ul>';
+        document.getElementById('employeeList').innerHTML = statusHTML; // Update HTML
+      } catch (e) {
+        console.error('Error parsing JSON:', e);
       }
-      statusHTML += employees[i].name;
-      statusHTML += '</li>';
+    } else {
+      console.error('Request failed. Status:', xhr.status);
     }
-    statusHTML += '</ul>';
-    document.getElementById('employeeList').innerHTML = statusHTML;
   }
 };
-xhr.open('GET', '../data/employees.json');
+
+// Open the request and send it
+xhr.open('GET', 'data/employees.json');
 xhr.send();
