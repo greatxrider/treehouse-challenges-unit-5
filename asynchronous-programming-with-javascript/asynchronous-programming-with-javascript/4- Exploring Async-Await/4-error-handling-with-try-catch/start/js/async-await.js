@@ -4,14 +4,21 @@ const peopleList = document.getElementById('people');
 const btn = document.querySelector('button');
 
 // Handle all fetch requests
-async function getPeopleInSpace(url) {
-  const peopleResponse = await fetch(url);
-  const peopleJSON = await peopleResponse.json();
+async function getJSON(url) {
+  try {
+    const response = await fetch(url);
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}
 
-  const profiles = peopleJSON.people.map( async (person) => {
+async function getPeopleInSpace(url) {
+  const peopleJSON = await getJSON(url);
+
+  const profiles = peopleJSON.people.map(async (person) => {
     const craft = person.craft;
-    const profileResponse = await fetch(wikiUrl + person.name);
-    const profileJSON = await profileResponse.json();
+    const profileJSON = await getJSON(wikiUrl + person.name);
 
     return { ...profileJSON, craft };
   });
@@ -21,7 +28,7 @@ async function getPeopleInSpace(url) {
 
 // Generate the markup for each profile
 function generateHTML(data) {
-  data.map( person => {
+  data.map(person => {
     const section = document.createElement('section');
     peopleList.appendChild(section);
     // Check if request returns a 'standard' page from Wiki
@@ -49,5 +56,9 @@ btn.addEventListener('click', (event) => {
 
   getPeopleInSpace(astrosUrl)
     .then(generateHTML)
-    .finally( () => event.target.remove() )
+    .catch(e => {
+      peopleList.innerHTML = '<h3>Something went wrong!</h3>';
+      console.error(e);
+    })
+    .finally(() => event.target.remove())
 });

@@ -8,7 +8,7 @@ async function getPeopleInSpace(url) {
   const peopleResponse = await fetch(url);
   const peopleJSON = await peopleResponse.json();
 
-  const profiles = peopleJSON.people.map( async (person) => {
+  const profiles = peopleJSON.people.map(async (person) => {
     const craft = person.craft;
     const profileResponse = await fetch(wikiUrl + person.name);
     const profileJSON = await profileResponse.json();
@@ -21,14 +21,14 @@ async function getPeopleInSpace(url) {
 
 // Generate the markup for each profile
 function generateHTML(data) {
-  data.map( person => {
+  data.map(person => {
     const section = document.createElement('section');
     peopleList.appendChild(section);
+    console.log(person);
     // Check if request returns a 'standard' page from Wiki
-    if (person.type === 'standard') {
+    if (person.type === 'standard' && person.thumbnail) {
       section.innerHTML = `
         <img src=${person.thumbnail.source}>
-        <span>${person.craft}</span>
         <h2>${person.title}</h2>
         <p>${person.description}</p>
         <p>${person.extract}</p>
@@ -44,10 +44,10 @@ function generateHTML(data) {
   });
 }
 
-btn.addEventListener('click', async (event) => {
+btn.addEventListener('click', (event) => {
   event.target.textContent = 'Loading...';
 
-  const astros = await getPeopleInSpace(astrosUrl);
-  generateHTML(astros);
-  event.target.remove();
+  getPeopleInSpace(astrosUrl)
+    .then(generateHTML)
+    .finally(() => event.target.remove())
 });
