@@ -1,5 +1,5 @@
 const select = document.getElementById('breeds');
-const card = document.querySelector('.card'); 
+const card = document.querySelector('.card');
 const form = document.querySelector('form');
 
 // ------------------------------------------
@@ -8,7 +8,9 @@ const form = document.querySelector('form');
 
 function fetchData(url) {
   return fetch(url)
-           .then(res => res.json())
+    .then(checkStatus)
+    .then(res => res.json())
+    .catch(error => console.log('Looks like there was a problem!', error))
 }
 
 fetchData('https://dog.ceo/api/breeds/list')
@@ -20,6 +22,14 @@ fetchData('https://dog.ceo/api/breeds/image/random')
 // ------------------------------------------
 //  HELPER FUNCTIONS
 // ------------------------------------------
+
+function checkStatus() {
+  if (response.ok) {
+    return Promise.resolve(response);
+  } else {
+    return Promise.reject(new Error(response.statusText));
+  }
+}
 
 function generateOptions(data) {
   const options = data.map(item => `
@@ -40,7 +50,7 @@ function fetchBreedImage() {
   const breed = select.value;
   const img = card.querySelector('img');
   const p = card.querySelector('p');
-  
+
   fetchData(`https://dog.ceo/api/breed/${breed}/images/random`)
     .then(data => {
       img.src = data.message;
@@ -58,4 +68,3 @@ card.addEventListener('click', fetchBreedImage);
 // ------------------------------------------
 //  POST DATA
 // ------------------------------------------
-
