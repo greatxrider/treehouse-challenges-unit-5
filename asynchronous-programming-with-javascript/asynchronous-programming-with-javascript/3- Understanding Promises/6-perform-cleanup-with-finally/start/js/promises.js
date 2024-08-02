@@ -8,27 +8,27 @@ function getJSON(url) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url);
     xhr.onload = () => {
-      if(xhr.status === 200) {
+      if (xhr.status === 200) {
         let data = JSON.parse(xhr.responseText);
         resolve(data);
       } else {
-        reject( Error(xhr.statusText) );
+        reject(Error(xhr.statusText));
       }
     };
-    xhr.onerror = () => reject( Error('A network error occurred') );
+    xhr.onerror = () => reject(Error('A network error occurred'));
     xhr.send();
   });
 }
 
 function getProfiles(json) {
-  const profiles = json.people.map( person => {
-    return getJSON(wikiUrl + person.name);      
-  }); 
+  const profiles = json.people.map(person => {
+    return getJSON(wikiUrl + person.name);
+  });
   return Promise.all(profiles);
 }
 
 function generateHTML(data) {
-  data.map( person => {
+  data.map(person => {
     const section = document.createElement('section');
     peopleList.appendChild(section);
     // Check if request returns a 'standard' page from Wiki
@@ -50,11 +50,13 @@ function generateHTML(data) {
   });
 }
 
+
 btn.addEventListener('click', (event) => {
+  event.target.textContent = 'Loading....';
+
   getJSON(astrosUrl)
     .then(getProfiles)
     .then(generateHTML)
-    .catch( err => console.log(err) )
-
-  event.target.remove() 
+    .catch(err => console.log(err))
+    .finally(() => event.target.remove())
 });

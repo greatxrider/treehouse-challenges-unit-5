@@ -7,7 +7,7 @@ function getJSON(url, callback) {
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url);
   xhr.onload = () => {
-    if(xhr.status === 200) {
+    if (xhr.status === 200) {
       let data = JSON.parse(xhr.responseText);
       return callback(data);
     }
@@ -16,9 +16,9 @@ function getJSON(url, callback) {
 }
 
 function getProfiles(json) {
-  json.people.map( person => {
-    getJSON(wikiUrl + person.name, generateHTML);      
-  }); 
+  json.people.map(person => {
+    getJSON(wikiUrl + person.name, generateHTML);
+  });
 }
 
 // Generate the markup for each profile

@@ -4,20 +4,20 @@ const peopleList = document.getElementById('people');
 const btn = document.querySelector('button');
 
 function getProfiles(json) {
-  const profiles = json.people.map( person => {
+  const profiles = json.people.map(person => {
     const craft = person.craft;
     return fetch(wikiUrl + person.name)
-            .then( response => response.json() )
-            .then( profile => {
-              return { ...profile, craft };
-            })
-            .catch( err => console.log('Error Fetching Wiki: ', err) )     
-  }); 
+      .then(response => response.json())
+      .then(profile => {
+        return { ...profile, craft };
+      })
+      .catch(err => console.log('Error Fetching Wiki: ', err))
+  });
   return Promise.all(profiles);
 }
 
 function generateHTML(data) {
-  data.map( person => {
+  data.map(person => {
     const section = document.createElement('section');
     peopleList.appendChild(section);
     // Check if request returns a 'standard' page from Wiki
@@ -43,12 +43,12 @@ btn.addEventListener('click', (event) => {
   event.target.textContent = "Loading...";
 
   fetch(astrosUrl)
-    .then( response => response.json() )
+    .then(response => response.json())
     .then(getProfiles)
     .then(generateHTML)
-    .catch( err => {
+    .catch(err => {
       peopleList.innerHTML = '<h3>Something went wrong!</h3>';
       console.log(err);
     })
-    .finally( () => event.target.remove() )
+    .finally(() => event.target.remove())
 });

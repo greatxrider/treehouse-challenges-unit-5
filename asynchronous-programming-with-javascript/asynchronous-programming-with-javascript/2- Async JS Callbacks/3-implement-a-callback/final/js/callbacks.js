@@ -8,7 +8,7 @@ function getJSON(url, callback) {
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url);
   xhr.onload = () => {
-    if(xhr.status === 200) {
+    if (xhr.status === 200) {
       let data = JSON.parse(xhr.responseText);
       return callback(data);
     }
@@ -35,12 +35,12 @@ function generateHTML(data) {
       <p>Results unavailable for ${data.title}</p>
       ${data.extract_html}
     `;
-  }
-}
+  };
+};
 
-btn.addEventListener('click', (event) => { 
+btn.addEventListener('click', (event) => {
   getJSON(astrosUrl, (json) => {
-    json.people.map( person => {
+    json.people.map(person => {
       getJSON(wikiUrl + person.name, generateHTML);
     });
   });

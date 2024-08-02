@@ -3,36 +3,26 @@ const wikiUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
 const peopleList = document.getElementById('people');
 const btn = document.querySelector('button');
 
-function getJSON(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.onload = () => {
-      if(xhr.status === 200) {
-        let data = JSON.parse(xhr.responseText);
-        resolve(data);
-      } else {
-        reject( Error(xhr.statusText) );
-      }
-    };
-    xhr.onerror = () => reject( Error('A network error occurred') );
-    xhr.send();
-  });
-}
-
 function getProfiles(json) {
-  const profiles = json.people.map( person => {
-    return getJSON(wikiUrl + person.name);      
-  }); 
+  const profiles = json.people.map(person => {
+    const craft = person.craft;
+    return fetch(wikiUrl + person.name)
+      .then(response => response.json())
+      .then(profile => {
+        return { ...profile, craft };
+      })
+      .catch(err => console.log('Error Fetching Wiki: ', err))
+  });
   return Promise.all(profiles);
 }
 
 function generateHTML(data) {
-  data.map( person => {
+  data.map(person => {
     const section = document.createElement('section');
     peopleList.appendChild(section);
+    console.log(person);
     // Check if request returns a 'standard' page from Wiki
-    if (person.type === 'standard') {
+    if (person.type === 'standard' && person.thumbnail) {
       section.innerHTML = `
         <img src=${person.thumbnail.source}>
         <h2>${person.title}</h2>
@@ -53,12 +43,13 @@ function generateHTML(data) {
 btn.addEventListener('click', (event) => {
   event.target.textContent = "Loading...";
 
-  getJSON(astrosUrl)
+  fetch(astrosUrl)
+    .then(response => response.json())
     .then(getProfiles)
     .then(generateHTML)
-    .catch( err => {
+    .catch(err => {
       peopleList.innerHTML = '<h3>Something went wrong!</h3>';
       console.log(err);
     })
-    .finally( () => event.target.remove() )
+    .finally(() => event.target.remove())
 });
