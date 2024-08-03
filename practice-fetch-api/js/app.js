@@ -7,15 +7,17 @@ const countriesDiv = document.querySelector('.countries');
 const fetchData = async (url) => {
     try {
         const response = await fetch(url);
+        if (!response.ok) throw new Error('Something went wrong.');
         const data = await response.json();
         return data;
     } catch (error) {
+        console.log(error);
         throw error;
     }
 };
 
 const getCountries = () => {
-    const countriesData = fetchData('https://restcountries.com/v3.1/all');
+    const countriesData = fetchData('https://restcountries.com/v3.1/all?fields=name,flags,population,capital,region');
     return countriesData;
 }
 
@@ -30,10 +32,10 @@ const displayCountries = (countries) => {
             let html = `
             <div class="country">
                 <h3 class="country-name">${country.name.common}</h3>
-                <img class="country-flag" src="${country.flags.png}"/>
+                <img class="country-flag" src="${country.flags.svg}"/>
                 <div class="content">
                     <h3>Capital</h3>
-                    <p>${country.capital[0]}</p>
+                    <p>${country.capital}</p>
                     <h3>Population</h3>
                     <p>${country.population}</p>
                     <h3>Region</h3>
@@ -41,7 +43,7 @@ const displayCountries = (countries) => {
                 </div>
             </div>
         `;
-            countriesDiv.innerHTML += html;
+            countriesDiv.insertAdjacentHTML('beforeend', html);
         }
     })
 }
